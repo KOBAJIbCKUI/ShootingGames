@@ -1,0 +1,97 @@
+name: ShootingGames
+main: com.KOBAJIbCKUI.ShootingGames.ShootingGames
+version: 0.1
+
+commands:
+  createLobby:
+    description: Creates lobby for ShootingGames
+    permission: ShootingGames.createLobby
+    usage: /createLobby <lobbyName>
+  removeLobby:
+    description: Removes lobby
+    permission: ShootingGames.removeLobby
+    usage: /removeLobby <lobbyName>
+  showLobbies:
+    description: Shows list of lobbies
+    permission: ShootingGames.showLobbies
+    usage: /showLobbies
+  addMap:
+    description: Adds map to current lobby
+    permission: ShootingGames.addMap
+    usage: /addMap <mapName>
+  removeMap:
+    description: Removes map from current lobby
+    permission: ShootingGames.removeMap
+    usage: /removeMap <mapName>
+  addSpawnPoint:
+    description: Adds spawn point to map in current lobby, if no coordinates present player's current position will be used
+    permission: ShootingGames.addSpawnPoint
+    usage: /addSpawnPoint <mapName> <x> <y> <z> /addSpawnPoint <mapName>
+  removeSpawnPoint:
+    description: Removes spawn point from map in current lobby
+    permission: ShootingGames.removeSpawnPoint
+    usage: /removeSpawnPoint <mapName> <x> <y> <z> /removeSpawnPoint <mapName> <indexOfSpawnPoint>
+  joinLobby:
+    description: Join lobby
+    permission: ShootingGames.joinLobby
+    usage: /joinLobby <lobbyName>
+  leaveLobby:
+    description: Leave current lobby
+    permission: ShootingGames.leaveLobby
+    usage: /leaveLobby
+  showLobbyMaps:
+    description: Shows maps in current lobby
+    permission: ShootingGames.showLobbyMaps
+    usage: /showLobbyMaps
+  showLobbyPlayers:
+    description: Shows players in current lobby
+    permission: ShootingGames.showLobbyPlayers
+    usage: /showLobbyPlayers
+  spectateBattle:
+    description: Allows to spectate battle in current lobby
+    permission: ShootingGames.spectateBattle
+    usage: /spectateBattle
+  stopSpectateBattle:
+    description: Stops battle spectating
+    permission: ShootingGames.stopSpectateBattle
+    usage: /stopSpectateBattle
+  startBattle:
+    description: Starts battle on specified map
+    permission: ShootingGames.startBattle
+    usage: /startBattle <mapName>
+  startRandomBattle:
+    description: Starts battle on random suitable map
+    permission: ShootingGames.startRandomBattle
+    usage: /startRandomBattle
+  showMapSpawnPoints:
+    description: Show spawn points' coordinates on specified map
+    permission: ShootingGames.showMapSpawnPoints
+    usage: /showMapSpawnPoints <mapName>
+  setGulag:
+    description: Set map to fight in last 1 minute
+    permission: ShootingGames.setGulag
+    usage: /setGulag <mapName>
+  showLobbyInfo:
+    description: Show information about specified lobby
+    permission: ShootingGames.showLobbyInfo
+    usage: /showLobbyInfo <lobbyName>
+  toggleH:
+    description: Toggles H
+    permission: ShootingGames.toggleH
+    usage: /toggleH
+  toggleS:
+    description: Toggles S
+    permission: ShootingGames.toggleS
+    usage: /toggleS
+  toggleCampersGlowing:
+    description: Toggles campers glowing
+    permission: ShootingGames.toggleCampersGlowing
+    usage: /toggleCampersGlowing
+  stopBattle:
+    description: Stops battle in current lobby
+    permission: ShootingGames.stopBattle
+    usage: /stopBattle
+  changeSaveTech:
+    description: Changes save technolgy for saving lobbies list
+    permission: ShootingGames.changeSaveTech
+    usage: /changeSaveTech <default xml json>
