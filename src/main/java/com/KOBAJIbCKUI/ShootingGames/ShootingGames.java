@@ -1,5 +1,9 @@
 package com.KOBAJIbCKUI.ShootingGames;
 
+import com.KOBAJIbCKUI.ShootingGames.commands.*;
+import com.KOBAJIbCKUI.ShootingGames.listeners.ShootingGamesListener;
+import com.KOBAJIbCKUI.ShootingGames.lobby.LobbiesListWrapper;
+import com.KOBAJIbCKUI.ShootingGames.lobby.ShootingBattle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
@@ -54,48 +58,48 @@ public class ShootingGames extends JavaPlugin {
             changeSaveTechCommandExecutor;
 
     //File configuration declaration
-    protected FileConfiguration config;
+    public FileConfiguration config;
 
     //Variables from config
-    static int REWARD_FOR_WIN;
-    static int REWARD_FOR_LOOSE;
-    static int REWARD_FOR_KILL;
-    static int BONUS;
-    static int KILLSTREAK_LENGTH;
-    static boolean CAMPERS_GLOWING;
-    static String serializationTechnology;
+    public static int REWARD_FOR_WIN;
+    public static int REWARD_FOR_LOOSE;
+    public static int REWARD_FOR_KILL;
+    public static int BONUS;
+    public static int KILLSTREAK_LENGTH;
+    public static boolean CAMPERS_GLOWING;
+    public static String serializationTechnology;
 
     //Strings answers
-    static final String BATTLE_HAS_BEGUN = "" + ChatColor.RED + ChatColor.BOLD + "Battle has begun!";
-    static final String MINUTES_TO_GULAG = "" + ChatColor.RED + ChatColor.BOLD + "You have 15 minutes before GULAG";
-    static final String BATTLE_WON = "" + ChatColor.GREEN + ChatColor.BOLD + "%s won the battle!";
-    static final String ROUND_DRAW = "" + ChatColor.GRAY + ChatColor.BOLD + "Battle draw!";
-    static final String BATTLE_STOPPED = "" + ChatColor.BLUE + ChatColor.BOLD + "Battle stopped!";
-    static final String KILLER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've killed %s and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
-    static final String WINNER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've won the battle and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
-    static final String LOOSER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've lost the battle and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
-    static final String BATTLE_ENDS_IN_10 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "10 minutes!";
-    static final String BATTLE_ENDS_IN_5 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "5 minutes!";
-    static final String BATTLE_ENDS_IN_1 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "1 minute!";
-    static final String WELCOME_TO_GULAG = "" + ChatColor.RED + ChatColor.BOLD + "Welcome to GULAG,";
-    static final String TRAITORS = "" + ChatColor.RED + ChatColor.BOLD + "traitors to Motherland!";
-    static final String NAME_TAG_VISIBLE = "" + ChatColor.GOLD + ChatColor.BOLD + "Now name tags are " + ChatColor.RED + ChatColor.BOLD + "visible!";
-    static final String WELCOME_MESSAGE = "" + ChatColor.GREEN + "Welcome to ShootingGames server! BTW Sanya loh.";
+    public static final String BATTLE_HAS_BEGUN = "" + ChatColor.RED + ChatColor.BOLD + "Battle has begun!";
+    public static final String MINUTES_TO_GULAG = "" + ChatColor.RED + ChatColor.BOLD + "You have 15 minutes before GULAG";
+    public static final String BATTLE_WON = "" + ChatColor.GREEN + ChatColor.BOLD + "%s won the battle!";
+    public static final String ROUND_DRAW = "" + ChatColor.GRAY + ChatColor.BOLD + "Battle draw!";
+    public static final String BATTLE_STOPPED = "" + ChatColor.BLUE + ChatColor.BOLD + "Battle stopped!";
+    public static final String KILLER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've killed %s and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
+    public static final String WINNER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've won the battle and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
+    public static final String LOOSER_REWARD = "" + ChatColor.GOLD + ChatColor.BOLD + "You've lost the battle and got " + ChatColor.AQUA + ChatColor.BOLD + "%d diamonds";
+    public static final String BATTLE_ENDS_IN_10 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "10 minutes!";
+    public static final String BATTLE_ENDS_IN_5 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "5 minutes!";
+    public static final String BATTLE_ENDS_IN_1 = "" + ChatColor.GOLD + ChatColor.BOLD + "Battle ends in " + ChatColor.RED + ChatColor.BOLD + "1 minute!";
+    public static final String WELCOME_TO_GULAG = "" + ChatColor.RED + ChatColor.BOLD + "Welcome to GULAG,";
+    public static final String TRAITORS = "" + ChatColor.RED + ChatColor.BOLD + "traitors to Motherland!";
+    public static final String NAME_TAG_VISIBLE = "" + ChatColor.GOLD + ChatColor.BOLD + "Now name tags are " + ChatColor.RED + ChatColor.BOLD + "visible!";
+    public static final String WELCOME_MESSAGE = "" + ChatColor.GREEN + "Welcome to ShootingGames server! BTW Sanya loh.";
 
     //Teams declaration
-    static Team NEUTRAL_TEAM;
-    static Team DEATHMATCH_TEAM;
+    public static Team NEUTRAL_TEAM;
+    public static Team DEATHMATCH_TEAM;
 
     //Objectives declaration
-    static Objective WINS_OBJECTIVE;
-    static Objective KILLSTREAK_OBJECTIVE;
+    public static Objective WINS_OBJECTIVE;
+    public static Objective KILLSTREAK_OBJECTIVE;
 
     //Lobbies list declaration
-    LobbiesListWrapper lobbiesListWrapper;
+    public LobbiesListWrapper lobbiesListWrapper;
 
     //Players in battles map initialization
     //Key = player, value = shooting battle, where player takes part
-    static Map<Player, ShootingBattle> playersInBattles = new HashMap<>();
+    public static Map<Player, ShootingBattle> playersInBattles = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -163,7 +167,7 @@ public class ShootingGames extends JavaPlugin {
         createLobbyCommandExecutor = new CreateLobbyCommandExecutor(this);
         removeLobbyCommandExecutor = new RemoveLobbyCommandExecutor(this);
         showLobbiesCommandExecutor = new ShowLobbiesCommandExecutor(this);
-        addShootingMapCommandExecutor = new  AddShootingMapCommandExecutor(this);
+        addShootingMapCommandExecutor = new AddShootingMapCommandExecutor(this);
         removeShootingMapCommandExecutor = new RemoveShootingMapCommandExecutor(this);
         addSpawnPointCommandExecutor = new AddSpawnPointCommandExecutor(this);
         removeSpawnPointCommandExecutor = new RemoveSpawnPointCommandExecutor(this);
