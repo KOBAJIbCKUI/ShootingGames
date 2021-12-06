@@ -1,0 +1,5 @@
+out/
+.idea/
+target/
+src/test/
+ShootingGames.iml
