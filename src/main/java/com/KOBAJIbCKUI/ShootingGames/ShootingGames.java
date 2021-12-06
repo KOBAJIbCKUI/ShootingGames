@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -211,7 +212,7 @@ public class ShootingGames extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        log.info("It's really don't working!");
+        log.info("It's really don't working, dude!");
 
         //Saving lobbies list
         saveLobbies(SAVE_LOBBY_PATH);
