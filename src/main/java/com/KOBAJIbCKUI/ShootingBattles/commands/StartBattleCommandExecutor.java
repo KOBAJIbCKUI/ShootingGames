@@ -1,9 +1,11 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
-import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingBattle;
+import com.KOBAJIbCKUI.ShootingBattles.battle.ShootingBattle;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -38,21 +40,15 @@ public class StartBattleCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-                }
-            }
-
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
             if (foundLobby == null) {
                 sender.sendMessage("You are not a member of any lobby");
                 return true;
             }
 
-            if (foundLobby.isInBattle) {
-                sender.sendMessage("Lobby " + foundLobby.getName() + " is already in battle");
+            if (foundLobby.getStatus() != LobbyStatus.READY) {
+                sender.sendMessage("Lobby " + foundLobby.getName() + " is in status " + foundLobby.getStatus().getName());
                 return true;
             }
 
@@ -64,41 +60,42 @@ public class StartBattleCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            if (foundLobby.getGulagMap() == null) {
+            if (foundLobby.playersQuantity() < foundLobby.getMinPlayers()) {
+                sender.sendMessage("Too few players in lobby to begin battle. Min number is " + foundLobby.getMinPlayers());
+                return true;
+            }
+
+            if (foundLobby.playersQuantity() > foundLobby.getMaxPlayers()) {
+                sender.sendMessage("Too many players in lobby to begin battle. Max number is " + foundLobby.getMaxPlayers());
+            }
+
+            if (foundLobby.getBoard().areInOneLobbyBattleTeam(foundLobby.getPlayers())) {
+                sender.sendMessage("Unable to start battle because all players are in one team");
+                return true;
+            }
+
+            if (foundLobby.isTeleportToGulag() && foundLobby.getGulagMap() == null) {
                 sender.sendMessage("Gulag map is not set");
                 return true;
             }
 
-            if (foundLobby.playersQuantity() < 2) {
-                sender.sendMessage("Too few players in lobby " + foundLobby.getName() + " to begin battle");
-                return true;
-            }
-
-            List<Player> playersForBattle = new ArrayList<>();
-            Player playerToAdd;
-            for (UUID playerID : foundLobby.getPlayers()) {
-                playerToAdd = Bukkit.getPlayer(playerID);
-                if (playerToAdd != null) {
-                    playersForBattle.add(playerToAdd);
-                }
-            }
-
-            if (playersForBattle.size() < 2) {
-                sender.sendMessage("Too few online players in lobby " + foundLobby.getName() + " to begin battle");
-                return true;
-            }
-
-            if (playersForBattle.size() > shootingMap.spawnPointsQuantity()) {
+            if (foundLobby.isTeleportToGulag() && (foundLobby.playersQuantity() > shootingMap.spawnPointsQuantity())) {
                 sender.sendMessage("Too few spawn points on map " + args[0] + " to begin battle");
                 return true;
             }
 
-            if (playersForBattle.size() > foundLobby.getGulagMap().spawnPointsQuantity()) {
+            if (foundLobby.playersQuantity() > foundLobby.getGulagMap().spawnPointsQuantity()) {
                 sender.sendMessage("Too few spawn points on gulag map to begin battle");
                 return true;
             }
 
-            ShootingBattle.createBattle(shootingGames, foundLobby, playersForBattle, shootingMap);
+            ShootingBattle shootingBattle = new ShootingBattle(shootingGames, foundLobby, shootingMap);
+
+            for (UUID uuid : foundLobby.getPlayers()) {
+                shootingBattle.getBattlePlayerData().joinBattle(uuid);
+            }
+
+            shootingBattle.startCountdown();
 
             sender.sendMessage("Battle in lobby " + foundLobby.getName() + " on map " + shootingMap.getName() + " successfully started");
             return true;

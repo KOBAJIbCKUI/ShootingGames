@@ -1,10 +1,12 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
+import com.KOBAJIbCKUI.ShootingBattles.battle.ShootingBattle;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
-import com.KOBAJIbCKUI.ShootingBattles.lobby.PlayerBattleSpawner;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
+import com.KOBAJIbCKUI.ShootingBattles.managers.PlayersManager;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,42 +31,37 @@ public class SpectateBattleCommandExecutor implements CommandExecutor {
             player = Bukkit.getPlayer(args[0]);
         }
 
-        if (player == null){
+        if (player == null) {
             sender.sendMessage("This command can be run only by players");
             return true;
         }
 
-        if (ShootingGames.playersInBattles.containsKey(player)) {
-            sender.sendMessage("You are cannot do this in battle");
+        PlayersManager playersManager = shootingGames.getPlayersManager();
+        if (playersManager.hasPlayerData(player)) {
+            sender.sendMessage("You cannot do this being in battle");
             return true;
         }
 
-        Lobby foundLobby = null;
-        for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-            if (lobby.getPlayers().contains(player.getUniqueId())) {
-                foundLobby = lobby;
-                break;
-
-            }
-        }
-
+        LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+        Lobby foundLobby = lobbiesManager.findLobby(player);
         if (foundLobby == null) {
             sender.sendMessage("You are not a member of any lobby");
             return true;
         }
 
-        if (!foundLobby.isInBattle) {
-            sender.sendMessage("There is no battle in lobby " + foundLobby.getName());
+        if (!(foundLobby.getStatus() == LobbyStatus.RUNNING || foundLobby.getStatus() == LobbyStatus.COUNTDOWN)) {
+            sender.sendMessage("Nothing to spectate");
             return true;
         }
 
-        if (foundLobby.currentBattle.getSpectators().add(player)) {
-            player.setGameMode(GameMode.SPECTATOR);
-            PlayerBattleSpawner.spawnSpectator(player, foundLobby.currentBattle.shootingMap.getSpawnPoints());
-            sender.sendMessage("Begin spectating");
-        } else {
+        if (playersManager.hasSpectatorData(player)) {
             sender.sendMessage("You are already spectating");
+            return true;
         }
+
+        ShootingBattle shootingBattle = foundLobby.getCurrentBattle();
+        shootingBattle.getBattlePlayerData().spectateBattle(player);
+        sender.sendMessage("Begin spectating");
         return true;
     }
 }

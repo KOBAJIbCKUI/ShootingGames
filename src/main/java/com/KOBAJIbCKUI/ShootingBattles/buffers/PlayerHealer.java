@@ -1,8 +1,6 @@
 package com.KOBAJIbCKUI.ShootingBattles.buffers;
 
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +16,14 @@ public class PlayerHealer implements Runnable {
 
     @Override
     public void run() {
-        healingPlayer.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 1, 1));
+        double health = healingPlayer.getHealth();
+        if (health >= 20) {
+            return;
+        }
+        if (health <= 16) {
+            healingPlayer.setHealth(health + 4);
+        } else if (health > 16) {
+            healingPlayer.setHealth(health + (20 - health));
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,26 +28,27 @@ public class ShowLobbyMapsCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        Lobby foundLobby = null;
-        for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-            if (lobby.getPlayers().contains(player.getUniqueId())) {
-                foundLobby = lobby;
-                break;
-
-            }
-        }
-
+        LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+        Lobby foundLobby = lobbiesManager.findLobby(player);
         if (foundLobby == null) {
             sender.sendMessage("You are not a member of any lobby");
             return true;
         }
 
         if (foundLobby.getShootingMaps().isEmpty()) {
-            sender.sendMessage("Map list in lobby " + foundLobby.getName() + " is empty");
+            sender.sendMessage("Maps list is empty");
+            return true;
         }
-        sender.sendMessage("Map list in lobby " + foundLobby.getName() + ":");
+
+        sender.sendMessage("Maps list:");
         for (ShootingMap shootingMap : foundLobby.getShootingMaps()) {
             sender.sendMessage("-" + shootingMap.getName());
+        }
+
+        if (foundLobby.getGulagMap() == null) {
+            sender.sendMessage("No gulag map");
+        } else {
+            sender.sendMessage("Gulag map is " + foundLobby.getGulagMap().getName());
         }
         return true;
     }

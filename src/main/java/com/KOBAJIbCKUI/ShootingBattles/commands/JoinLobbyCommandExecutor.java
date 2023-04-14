@@ -2,12 +2,12 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
+import com.KOBAJIbCKUI.ShootingBattles.managers.PlayersManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.NoSuchElementException;
 
 public class JoinLobbyCommandExecutor implements CommandExecutor {
 
@@ -30,38 +30,33 @@ public class JoinLobbyCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            if (ShootingGames.playersInBattles.containsKey(player)) {
-                sender.sendMessage("You can't do this being in battle");
+            PlayersManager playersManager = shootingGames.getPlayersManager();
+            if (playersManager.hasData(player)) {
+                sender.sendMessage("You cannot do this being in battle");
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-
-                }
-            }
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
 
             if (foundLobby != null) {
-                sender.sendMessage("You cannot join another lobby, before you leave lobby " + foundLobby.getName());
+                if (foundLobby.getName().equals(args[0])) {
+                    sender.sendMessage("You are already in lobby " + foundLobby.getName());
+                } else {
+                    sender.sendMessage("You cannot join another lobby, before you leave lobby " + foundLobby.getName());
+                }
                 return true;
             }
 
-            Lobby lobby;
-            try {
-                lobby = shootingGames.lobbiesListWrapper.lobbies.stream().filter(o -> o.getName().equals(args[0])).findFirst().get();
-            } catch (NoSuchElementException e) {
+            if ((foundLobby = lobbiesManager.findLobby(args[0])) == null) {
                 sender.sendMessage("Lobby " + args[0] + " doesn't exist");
                 return true;
             }
 
-            if (lobby.addPlayer(player)) {
-                sender.sendMessage("You successfully joined lobby " + lobby.getName());
-                shootingGames.saveLobbies(ShootingGames.SAVE_LOBBY_PATH);
+            if (foundLobby.addPlayer(player)) {
+                sender.sendMessage("You successfully joined lobby " + foundLobby.getName());
             } else {
-                sender.sendMessage("You are already in lobby " + lobby.getName());
+                sender.sendMessage("You are already in lobby " + foundLobby.getName());
             }
             return true;
         }

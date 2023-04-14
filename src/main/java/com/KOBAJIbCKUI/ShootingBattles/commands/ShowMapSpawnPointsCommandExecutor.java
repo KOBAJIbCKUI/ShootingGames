@@ -3,6 +3,7 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,15 +31,8 @@ public class ShowMapSpawnPointsCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-
-                }
-            }
-
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
             if (foundLobby == null) {
                 sender.sendMessage("You are not a member of any lobby");
                 return true;

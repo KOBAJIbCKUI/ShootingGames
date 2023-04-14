@@ -3,7 +3,6 @@ package com.KOBAJIbCKUI.ShootingBattles;
 import org.bukkit.Location;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface BattleMap {
     String getName();

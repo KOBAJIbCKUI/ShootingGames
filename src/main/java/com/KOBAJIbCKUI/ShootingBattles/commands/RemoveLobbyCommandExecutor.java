@@ -1,12 +1,13 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import java.util.NoSuchElementException;
+import org.bukkit.entity.Player;
 
 public class RemoveLobbyCommandExecutor implements CommandExecutor {
     private ShootingGames shootingGames;
@@ -20,24 +21,38 @@ public class RemoveLobbyCommandExecutor implements CommandExecutor {
 
         if (args.length == 1) {
 
-            Lobby lobby;
-            try {
-                lobby = shootingGames.lobbiesListWrapper.lobbies.stream().filter(o -> o.getName().equals(args[0])).findFirst().get();
-            } catch (NoSuchElementException e) {
+            Player player = null;
+            if (sender instanceof Player) {
+                player = (Player) sender;
+            }
+            if (player == null) {
+                sender.sendMessage("This command can be run only by players");
+                return true;
+            }
+
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby;
+
+            if ((foundLobby = lobbiesManager.findLobby(args[0])) == null) {
                 sender.sendMessage("Lobby " + args[0] + " doesn't exist");
                 return true;
             }
 
-            if (lobby.isInBattle) {
-                sender.sendMessage("Lobby " + lobby.getName() + " is in battle");
+            if (!foundLobby.getOwner().equals(player.getUniqueId())) {
+                sender.sendMessage("You are not owner of this lobby");
                 return true;
             }
 
-            if (shootingGames.lobbiesListWrapper.lobbies.remove(lobby)) {
-                sender.sendMessage("Lobby " + lobby.getName() + " successfully deleted");
-                shootingGames.saveLobbies(ShootingGames.SAVE_LOBBY_PATH);
+            if (foundLobby.getStatus() != LobbyStatus.READY) {
+                sender.sendMessage("Lobby " + foundLobby.getName() + " is in status " + foundLobby.getStatus().getName());
+                return true;
+            }
+
+            if (lobbiesManager.removeLobby(foundLobby)) {
+                sender.sendMessage("Lobby " + foundLobby.getName() + " successfully deleted");
+                shootingGames.lobbiesConfig().saveLobbiesData();
             } else {
-                sender.sendMessage("Lobby " + lobby.getName() + " doesn't exist");
+                sender.sendMessage("Lobby " + foundLobby.getName() + " doesn't exist");
             }
             return true;
         }

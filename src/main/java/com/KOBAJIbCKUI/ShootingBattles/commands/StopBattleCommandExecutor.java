@@ -1,9 +1,9 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
-import com.KOBAJIbCKUI.ShootingBattles.events.StopBattleEvent;
-import org.bukkit.Bukkit;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,26 +28,26 @@ public class StopBattleCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-                }
-            }
-
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
             if (foundLobby == null) {
                 sender.sendMessage("You are not a member of any lobby");
                 return true;
             }
 
-            if (!foundLobby.isInBattle) {
-                sender.sendMessage("There is no battle in lobby " + foundLobby.getName());
+            if (!foundLobby.getOwner().equals(player.getUniqueId())) {
+                sender.sendMessage("You are not owner of this lobby");
                 return true;
             }
 
-            Bukkit.getPluginManager().callEvent(new StopBattleEvent(foundLobby.currentBattle));
+            if (foundLobby.getStatus() == LobbyStatus.READY) {
+                sender.sendMessage("No battles to stop");
+                return true;
+            }
+
+            foundLobby.getCurrentBattle().stopBattle();
             sender.sendMessage("Battle in lobby " + foundLobby.getName() + " stopped");
+            return true;
         }
         return false;
     }

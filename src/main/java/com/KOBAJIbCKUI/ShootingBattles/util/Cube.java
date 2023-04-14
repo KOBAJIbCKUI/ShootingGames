@@ -1,4 +1,4 @@
-package com.KOBAJIbCKUI.ShootingBattles.buffers;
+package com.KOBAJIbCKUI.ShootingBattles.util;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

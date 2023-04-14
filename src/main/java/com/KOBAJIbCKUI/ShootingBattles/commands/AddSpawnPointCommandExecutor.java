@@ -1,6 +1,8 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
-import com.KOBAJIbCKUI.ShootingBattles.Coordinates;
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
+import com.KOBAJIbCKUI.ShootingBattles.util.Coordinates;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
@@ -32,27 +34,24 @@ public class AddSpawnPointCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-
-                }
-            }
-
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
             if (foundLobby == null) {
                 sender.sendMessage("You are not a member of any lobby");
                 return true;
             }
 
-            if (foundLobby.isInBattle) {
-                sender.sendMessage("Lobby " + foundLobby.getName() + " is in battle");
+            if (!foundLobby.getOwner().equals(player.getUniqueId())) {
+                sender.sendMessage("You are not owner of this lobby");
+                return true;
+            }
+
+            if (foundLobby.getStatus() != LobbyStatus.READY) {
+                sender.sendMessage("Lobby " + foundLobby.getName() + " is in status " + foundLobby.getStatus().getName());
                 return true;
             }
 
             ShootingMap shootingMap;
-
             try {
                 shootingMap = foundLobby.getShootingMaps().stream().filter(o -> o.getName().equals(args[0])).findFirst().get();
             } catch (NoSuchElementException e) {
@@ -80,7 +79,7 @@ public class AddSpawnPointCommandExecutor implements CommandExecutor {
 
             if (shootingMap.addSpawnPoint(coordinates)) {
                 sender.sendMessage("Spawn point successfully added");
-                shootingGames.saveLobbies(ShootingGames.SAVE_LOBBY_PATH);
+                shootingGames.lobbiesConfig().saveLobbiesData();
             } else {
                 sender.sendMessage("This spawn point already exists");
             }

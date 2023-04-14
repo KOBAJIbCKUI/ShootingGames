@@ -2,8 +2,8 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,33 +30,19 @@ public class ShowLobbyPlayersCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        Lobby foundLobby = null;
-        for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-            if (lobby.getPlayers().contains(player.getUniqueId())) {
-                foundLobby = lobby;
-                break;
-
-            }
-        }
-
+        LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+        Lobby foundLobby = lobbiesManager.findLobby(player);
         if (foundLobby == null) {
             sender.sendMessage("You are not a member of any lobby");
             return true;
         }
 
         if (foundLobby.playersQuantity() == 0) {
-            sender.sendMessage("There are no players in lobby " + foundLobby.getName());
+            sender.sendMessage("No players in lobby");
         } else {
-            sender.sendMessage("Players in lobby " + foundLobby.getName() + ":");
+            sender.sendMessage("Players in lobby: ");
             for (UUID uuid : foundLobby.getPlayers()) {
-                Player lobbyPlayer;
-                OfflinePlayer offlineLobbyPlayer;
-                if ((lobbyPlayer = Bukkit.getPlayer(uuid)) == null) {
-                    offlineLobbyPlayer = Bukkit.getOfflinePlayer(uuid);
-                    sender.sendMessage(" " + offlineLobbyPlayer.getName() + " - offline");
-                } else {
-                    sender.sendMessage( " " + lobbyPlayer.getDisplayName() + " - online");
-                }
+                sender.sendMessage(" " + Bukkit.getPlayer(uuid).getDisplayName());
             }
         }
         return true;

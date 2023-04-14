@@ -2,7 +2,8 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
-import org.bukkit.GameMode;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
+import com.KOBAJIbCKUI.ShootingBattles.managers.PlayersManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,36 +27,27 @@ public class StopSpectateBattleCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        if (ShootingGames.playersInBattles.containsKey(player)) {
-            sender.sendMessage("You are cannot do this in battle");
+
+        PlayersManager playersManager = shootingGames.getPlayersManager();
+        if (playersManager.hasPlayerData(player)) {
+            sender.sendMessage("You cannot do this being in battle");
             return true;
         }
 
-        Lobby foundLobby = null;
-        for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-            if (lobby.getPlayers().contains(player.getUniqueId())) {
-                foundLobby = lobby;
-                break;
-            }
-        }
-
+        LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+        Lobby foundLobby = lobbiesManager.findLobby(player);
         if (foundLobby == null) {
             sender.sendMessage("You are not a member of any lobby");
             return true;
         }
 
-        if (!foundLobby.isInBattle) {
-            sender.sendMessage("There is no battle in lobby " + foundLobby.getName());
+        if (!playersManager.hasSpectatorData(player)) {
+            sender.sendMessage("You are not spectating anything");
             return true;
         }
 
-        if (foundLobby.currentBattle.getSpectators().remove(player)) {
-            player.teleport(player.getBedSpawnLocation());
-            player.setGameMode(GameMode.SURVIVAL);
-            sender.sendMessage("Stop spectating");
-        } else {
-            sender.sendMessage("You are not spectating any battle");
-        }
+        playersManager.getSpectatorData(player).getBattle().getBattlePlayerData().stopSpectateBattle(player);
+        sender.sendMessage("Stop spectating");
         return true;
     }
 }

@@ -1,17 +1,10 @@
-package com.KOBAJIbCKUI.ShootingBattles;
+package com.KOBAJIbCKUI.ShootingBattles.util;
 
 import org.bukkit.Location;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import java.io.Serializable;
-import java.util.Map;
 import java.util.Objects;
 
-@XmlRootElement
-@XmlType(name = "coordinate")
-public class Coordinates implements Serializable {
+public class Coordinates {
 
     private double x, y, z;
 
@@ -29,17 +22,14 @@ public class Coordinates implements Serializable {
         this.z = z;
     }
 
-    @XmlElement(name = "x")
     public void setX(double x) {
         this.x = x;
     }
 
-    @XmlElement(name = "y")
     public void setY(double y) {
         this.y = y;
     }
 
-    @XmlElement(name = "z")
     public void setZ(double z) {
         this.z = z;
     }

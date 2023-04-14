@@ -1,5 +1,7 @@
 package com.KOBAJIbCKUI.ShootingBattles.commands;
 
+import com.KOBAJIbCKUI.ShootingBattles.lobby.LobbyStatus;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
@@ -28,22 +30,21 @@ public class AddShootingMapCommandExecutor implements CommandExecutor {
                 return true;
             }
 
-            Lobby foundLobby = null;
-            for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-                if (lobby.getPlayers().contains(player.getUniqueId())) {
-                    foundLobby = lobby;
-                    break;
-
-                }
-            }
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            Lobby foundLobby = lobbiesManager.findLobby(player);
 
             if (foundLobby == null) {
                 sender.sendMessage("You are not a member of any lobby");
                 return true;
             }
 
-            if (foundLobby.isInBattle) {
-                sender.sendMessage("Lobby " + foundLobby.getName() + " is in battle");
+            if (!foundLobby.getOwner().equals(player.getUniqueId())) {
+                sender.sendMessage("You are not owner of this lobby");
+                return true;
+            }
+
+            if (foundLobby.getStatus() != LobbyStatus.READY) {
+                sender.sendMessage("Lobby " + foundLobby.getName() + " is in status " + foundLobby.getStatus().getName());
                 return true;
             }
 
@@ -54,7 +55,7 @@ public class AddShootingMapCommandExecutor implements CommandExecutor {
 
             if (foundLobby.addShootingMap(new ShootingMap(args[0]))) {
                 sender.sendMessage("Map " + args[0] + " successfully added to lobby " + foundLobby.getName());
-                shootingGames.saveLobbies(ShootingGames.SAVE_LOBBY_PATH);
+                shootingGames.lobbiesConfig().saveLobbiesData();
             } else {
                 sender.sendMessage("Map " + args[0] + " was NOT added to lobby " + foundLobby.getName());
             }

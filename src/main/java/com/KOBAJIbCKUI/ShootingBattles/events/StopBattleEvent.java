@@ -1,14 +1,12 @@
 package com.KOBAJIbCKUI.ShootingBattles.events;
 
-import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingBattle;
-import org.bukkit.event.Cancellable;
+import com.KOBAJIbCKUI.ShootingBattles.battle.ShootingBattle;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class StopBattleEvent extends Event implements Cancellable {
+public class StopBattleEvent extends Event {
     public static final HandlerList handlers = new HandlerList();
-    private ShootingBattle shootingBattle;
-    private boolean cancelled;
+    private final ShootingBattle shootingBattle;
 
     public StopBattleEvent(ShootingBattle shootingBattle) {
         this.shootingBattle = shootingBattle;
@@ -16,15 +14,6 @@ public class StopBattleEvent extends Event implements Cancellable {
 
     public ShootingBattle getShootingBattle() {
         return shootingBattle;
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,14 +17,13 @@ public class ShowLobbiesCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (args.length == 0) {
-            if (shootingGames.lobbiesListWrapper.lobbies.isEmpty()) {
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+            if (lobbiesManager.getLobbies().isEmpty()) {
                 sender.sendMessage("Lobbies list is empty");
             } else {
                 sender.sendMessage("Lobbies list:");
-                Lobby lobby;
-                for (int i = 0; i < shootingGames.lobbiesListWrapper.lobbies.size(); i++) {
-                    lobby = shootingGames.lobbiesListWrapper.lobbies.get(i);
-                    sender.sendMessage(lobby.getName() + " - " + (lobby.isInBattle ? "is in battle" : "is standing by"));
+                for (Lobby lobby : lobbiesManager.getLobbies()) {
+                    sender.sendMessage(lobby.getName() + " - " + lobby.getStatus().getName());
                 }
             }
             return true;

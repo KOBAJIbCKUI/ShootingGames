@@ -2,6 +2,8 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
+import com.KOBAJIbCKUI.ShootingBattles.managers.PlayersManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,19 +28,14 @@ public class LeaveLobbyCommandExecutor implements CommandExecutor {
             return true;
         }
 
-        if (ShootingGames.playersInBattles.containsKey(player)) {
-            sender.sendMessage("You can't do this being in battle");
+        PlayersManager playersManager = shootingGames.getPlayersManager();
+        if (playersManager.hasData(player)) {
+            sender.sendMessage("You cannot do this being in battle");
             return true;
         }
 
-        Lobby foundLobby = null;
-        for (Lobby lobby : shootingGames.lobbiesListWrapper.lobbies) {
-            if (lobby.getPlayers().contains(player.getUniqueId())) {
-                foundLobby = lobby;
-                break;
-
-            }
-        }
+        LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
+        Lobby foundLobby = lobbiesManager.findLobby(player);
 
         if (foundLobby == null) {
             sender.sendMessage("You are not a member of any lobby");
@@ -47,7 +44,6 @@ public class LeaveLobbyCommandExecutor implements CommandExecutor {
 
         if (foundLobby.removePlayer(player)) {
             sender.sendMessage("You successfully left lobby " + foundLobby.getName());
-            shootingGames.saveLobbies(ShootingGames.SAVE_LOBBY_PATH);
         } else {
             sender.sendMessage("Unable to leave lobby " + foundLobby.getName());
         }

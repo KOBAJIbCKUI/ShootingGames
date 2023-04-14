@@ -2,7 +2,6 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.buffers.Sonar;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,18 +31,13 @@ public class ToggleSonarCommandExecutor implements CommandExecutor {
         }
 
         Integer idToCancel;
-        if (Sonar.players.containsKey(player)) {
-            if ((idToCancel = Sonar.players.get(player)) != null) {
-                Bukkit.getScheduler().cancelTask(idToCancel);
-                Sonar.players.put(player, null);
-                sender.sendMessage("S disabled");
-            } else {
-                sender.sendMessage("S enabled");
-                Sonar.players.put(player, Bukkit.getScheduler().scheduleSyncRepeatingTask(shootingGames, new Sonar(player), 100, 100));
-            }
+        if (Sonar.sonars.containsKey(player)) {
+            Sonar.sonars.get(player).stop();
+            Sonar.sonars.remove(player);
+            sender.sendMessage("S disabled");
         } else {
+            Sonar.sonars.put(player, new Sonar(player));
             sender.sendMessage("S enabled");
-            Sonar.players.put(player, Bukkit.getScheduler().scheduleSyncRepeatingTask(shootingGames, new Sonar(player), 100, 100));
         }
 
         return true;

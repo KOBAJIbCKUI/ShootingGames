@@ -3,14 +3,12 @@ package com.KOBAJIbCKUI.ShootingBattles.commands;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.Lobby;
 import com.KOBAJIbCKUI.ShootingBattles.ShootingGames;
 import com.KOBAJIbCKUI.ShootingBattles.lobby.ShootingMap;
+import com.KOBAJIbCKUI.ShootingBattles.managers.LobbiesManager;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class ShowLobbyInfoCommandExecutor implements CommandExecutor {
@@ -23,43 +21,38 @@ public class ShowLobbyInfoCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (args.length == 1) {
+            LobbiesManager lobbiesManager = shootingGames.getLobbiesManager();
             Lobby foundLobby;
-            try {
-                foundLobby = shootingGames.lobbiesListWrapper.lobbies.stream().filter(o -> o.getName().equals(args[0])).findFirst().get();
-            } catch (NoSuchElementException e) {
+            if ((foundLobby = lobbiesManager.findLobby(args[0])) == null) {
                 sender.sendMessage("Lobby " + args[0] + " doesn't exist");
                 return true;
             }
 
-            if (foundLobby.isInBattle) {
-                sender.sendMessage("Lobby is in battle");
-            } else {
-                sender.sendMessage("Lobby is standing by");
-            }
 
-            sender.sendMessage("Players in lobby: ");
+            sender.sendMessage("Owner: " + Bukkit.getPlayer(foundLobby.getOwner()).getName());
+            sender.sendMessage("Status: " + foundLobby.getStatus().getName());
             if (foundLobby.playersQuantity() == 0) {
-                sender.sendMessage(" No players");
+                sender.sendMessage("No players in lobby");
             } else {
+                sender.sendMessage("Players in lobby: ");
                 for (UUID uuid : foundLobby.getPlayers()) {
-                    Player player;
-                    OfflinePlayer offlinePlayer;
-                    if ((player = Bukkit.getPlayer(uuid)) == null) {
-                        offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-                        sender.sendMessage(" " + offlinePlayer.getName() + " - offline");
-                    } else {
-                        sender.sendMessage(" " + player.getDisplayName() + " - online");
-                    }
+                    sender.sendMessage(" " + Bukkit.getPlayer(uuid).getDisplayName());
                 }
             }
 
-            sender.sendMessage("Maps in lobby: ");
             if (foundLobby.shootingMapsQuantity() == 0) {
-                sender.sendMessage(" No maps");
+                sender.sendMessage("No maps in lobby");
             } else {
+                sender.sendMessage("Maps in lobby: ");
                 for (ShootingMap map : foundLobby.getShootingMaps()) {
                     sender.sendMessage(" " + map.getName());
                 }
+            }
+
+            if (foundLobby.getGulagMap() == null) {
+                sender.sendMessage("No gulag map");
+            } else {
+                sender.sendMessage("Gulag map is " + foundLobby.getGulagMap().getName());
             }
             return true;
         }

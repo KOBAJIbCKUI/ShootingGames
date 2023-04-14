@@ -1,30 +1,24 @@
 package com.KOBAJIbCKUI.ShootingBattles.lobby;
 
-import com.KOBAJIbCKUI.ShootingBattles.Coordinates;
+import com.KOBAJIbCKUI.ShootingBattles.util.Coordinates;
 
-import javax.xml.bind.annotation.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@XmlRootElement
-@XmlType(name = "shooting_map")
-public class ShootingMap implements Serializable {
+public class ShootingMap {
     private String name;
-    private List<Coordinates> spawnPoints = new ArrayList<>();
-
-    public ShootingMap() {}
+    private List<Coordinates> spawnPoints;
 
     public ShootingMap(String name) {
         this.name = name;
+        this.spawnPoints = new ArrayList<>();
     }
 
     public String getName() {
         return name;
     }
 
-    @XmlAttribute(name = "name")
     public void setName(String name) {
         this.name = name;
     }
@@ -53,6 +47,14 @@ public class ShootingMap implements Serializable {
         return spawnPoints;
     }
 
+    public void setSpawnPoints(List<Coordinates> spawnPoints) {
+        this.spawnPoints = spawnPoints;
+    }
+
+    public int spawnPointsQuantity() {
+        return spawnPoints.size();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,15 +67,4 @@ public class ShootingMap implements Serializable {
     public int hashCode() {
         return Objects.hash(name, spawnPoints);
     }
-
-    @XmlElementWrapper(name = "spawn_points", nillable = true)
-    @XmlElement(name = "spawn_point")
-    public void setSpawnPoints(List<Coordinates> spawnPoints) {
-        this.spawnPoints = spawnPoints;
-    }
-
-    public int spawnPointsQuantity() {
-        return spawnPoints.size();
-    }
-
 }
